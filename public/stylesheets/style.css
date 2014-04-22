@@ -9,6 +9,13 @@ section {
   border-width: 1px 0px 1px 0px;
 }
 
+article {
+  border: 2px solid #ffffff;
+  padding: 7px;
+  margin: 20px;
+  background-color: #e5f5ff;
+}
+
 a {
   color: #00B7FF;
 }

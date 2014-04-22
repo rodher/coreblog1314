@@ -5,7 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var partials = require('express-partials');
-
+var connect = require('connect');
 var routes = require('./routes/index');
 
 var app = express();
@@ -18,12 +18,23 @@ app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
+app.use(connect.methodOverride());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(partials());
 
 app.use('/', routes);
+
+// Helper estatico:
+app.locals.escapeText =  function(text) {
+   return String(text)
+          .replace(/&(?!\w+;)/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/\n/g, '<br>');
+};
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
