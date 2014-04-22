@@ -16,7 +16,9 @@
     "express-partials": "~0.2.0",
     "connect": "~2.14.4",
     "sequelize": "~1.7.3",
-    "pg": "~3.0.3"
+    "pg": "~3.0.3",
+    "express-session": "~1.0.3",
+    "express-flash": "0.0.2"
   },
   "devDpendencies": {
     "sqlite3": "~2.2.3"

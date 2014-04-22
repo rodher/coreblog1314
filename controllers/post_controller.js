@@ -11,6 +11,7 @@ exports.load = function(req, res, next, id) {
             req.post = post;
             next();
           } else {
+            req.flash('error', 'No existe el post con id='+id+'.');
             next(new Error('No existe el post con id='+id+'.'));
           }
        })
@@ -47,7 +48,8 @@ exports.new = function(req, res, next) {
           body:  'Introduzca el texto del artículo'
         });
     
-    res.render('posts/new', {post: post});
+    res.render('posts/new', {post: post,
+                             validate_errors: {} });
 };
 
 // POST /posts
@@ -61,12 +63,20 @@ exports.create = function(req, res, next) {
     var validate_errors = post.validate();
     if (validate_errors) {
         console.log("Errores de validación:", validate_errors);
-        res.render('posts/new', {post: post});
+
+        req.flash('error', 'Los datos del formulario son incorrectos.');
+        for (var err in validate_errors) {
+           req.flash('error', validate_errors[err]);
+        };
+
+        res.render('posts/new', {post: post,
+                                 validate_errors: validate_errors});
         return;
     } 
     
     post.save()
         .success(function() {
+            req.flash('success', 'Post creado con éxito.');
             res.redirect('/posts');
         })
         .error(function(error) {
@@ -76,7 +86,9 @@ exports.create = function(req, res, next) {
 
 // GET /posts/33/edit
 exports.edit = function(req, res, next) {
-    res.render('posts/edit', {post: req.post});};
+    res.render('posts/edit', {post: req.post,
+                              validate_errors: {} });
+};
 
 // PUT /posts/33
 exports.update = function(req, res, next) {
@@ -86,11 +98,19 @@ exports.update = function(req, res, next) {
     var validate_errors = req.post.validate();
     if (validate_errors) {
         console.log("Errores de validación:", validate_errors);
-        res.render('posts/edit', {post: req.post});
+
+        req.flash('error', 'Los datos del formulario son incorrectos.');
+        for (var err in validate_errors) {
+            req.flash('error', validate_errors[err]);
+        };
+
+        res.render('posts/edit', {post: req.post,
+                                  validate_errors: validate_errors});
         return;
     } 
     req.post.save(['title', 'body'])
         .success(function() {
+            req.flash('success', 'Post actualizado con éxito.');
             res.redirect('/posts');
         })
         .error(function(error) {
@@ -102,6 +122,7 @@ exports.destroy = function(req, res, next) {
 
     req.post.destroy()
         .success(function() {
+            req.flash('success', 'Post eliminado con éxito.');
             res.redirect('/posts');
         })
         .error(function(error) {
