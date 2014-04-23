@@ -26,11 +26,13 @@ var sequelize = new Sequelize(DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD,
 
 
 // Importar la definicion de las clases.
-// La clase Post se importa desde el fichero post.js.
+// La clase Xxxx se importa desde el fichero xxxx.js.
 var Post = sequelize.import(path.join(__dirname,'post'));
+var User = sequelize.import(path.join(__dirname,'user'));
 
 // Exportar los modelos:
 exports.Post = Post;
+exports.User = User;
 
 
 // Crear las tablas en la base de datos que no se hayan creado aun.
