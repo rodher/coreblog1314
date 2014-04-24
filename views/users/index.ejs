@@ -22,9 +22,16 @@
        <form method='post' action='/users/<%= users[i].id %>' id='<%= formname %>'>
           <input type='hidden' name='_method' value='delete'>
           <a href="/users/<%= users[i].id %>"> Ver </a>
-          <a href="/users/<%= users[i].id %>/edit"> Editar </a>
-          <a href="" onclick="confirmarSubmit('¿Seguro que desea borrar el usuario?', 
-                                              '<%= formname %>'); return false"> Borrar </a> 
+
+          <% if (session.user && session.user.id == users[i].id) {%>
+             <a href="/users/<%= users[i].id %>/edit"> Editar </a>
+          <% } %>
+
+          <% if (false) { %>
+             <a href="" onclick="confirmarSubmit('¿Seguro que desea borrar el usuario?', 
+                                                 '<%= formname %>'); return false"> Borrar </a> 
+          <% } %>
+
        </form>
      </td>
   </tr>
