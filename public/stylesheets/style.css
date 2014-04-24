@@ -102,6 +102,11 @@ article {
   width: 100%;
 }
 
+#logininfo {
+  float: right;
+  clear: both;
+}
+
 a {
   color: #00B7FF;
 }
