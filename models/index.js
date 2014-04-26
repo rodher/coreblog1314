@@ -29,6 +29,7 @@ var sequelize = new Sequelize(DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD,
 // La clase Xxxx se importa desde el fichero xxxx.js.
 var Post = sequelize.import(path.join(__dirname,'post'));
 var User = sequelize.import(path.join(__dirname,'user'));
+var Comment = sequelize.import(path.join(__dirname,'comment'));
 
 
 // Relaciones
@@ -42,6 +43,9 @@ var User = sequelize.import(path.join(__dirname,'user'));
 // en vez de UserId, he añadido la opcion foreignKey.
 User.hasMany(Post, {foreignKey: 'AuthorId'});
 
+User.hasMany(Comment, {foreignKey: 'AuthorId'});
+Post.hasMany(Comment, {onDelete: 'cascade'});
+
 // La llamada Post.belongsTo(User);
 //  - crea en el modelo de Post un atributo llamado UserId,
 //  - y en el prototipo de Post se crean los metodos getUser y setUser.
@@ -53,10 +57,14 @@ User.hasMany(Post, {foreignKey: 'AuthorId'});
 // de acceso creados son setAuthor y getAuthor. 
 Post.belongsTo(User, {as: 'Author', foreignKey: 'AuthorId'});
 
+Comment.belongsTo(User, {as: 'Author', foreignKey: 'AuthorId'});
+Comment.belongsTo(Post);
+
 
 // Exportar los modelos:
 exports.Post = Post;
 exports.User = User;
+exports.Comment = Comment;
 
 
 // Crear las tablas en la base de datos que no se hayan creado aun.

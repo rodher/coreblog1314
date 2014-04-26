@@ -68,9 +68,24 @@ exports.show = function(req, res, next) {
             // si no lo encuentro añado {}.
             req.post.author = user || {};
 
-            res.render('posts/show', {
-                post: req.post
-            });
+            // Buscar comentarios del post
+            models.Comment
+                 .findAll({where: {PostId: req.post.id},
+                           order: [['updatedAt','DESC']],
+                           include: [{ model: models.User, as: 'Author' }] 
+                 })
+                 .success(function(comments) {
+                    var new_comment = models.Comment.build({
+                        body: 'Introduzca el texto del comentario'
+                    });
+                    res.render('posts/show', {
+                        post: req.post,
+                        comments: comments,
+                        comment: new_comment,
+                        validate_errors: {}
+                    });
+                 })
+                 .error(function(error) {next(error);});
         })
         .error(function(error) {
             next(error);

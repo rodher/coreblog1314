@@ -4,6 +4,7 @@ var router = express.Router();
 var postController = require('../controllers/post_controller');
 var userController = require('../controllers/user_controller');
 var sessionController = require('../controllers/session_controller');
+var commentController = require('../controllers/comment_controller.js');
 
 
 /* GET home page. */
@@ -24,6 +25,38 @@ router.get('/logout', sessionController.destroy);
 
 router.param('postid',postController.load);  // autoload :postid
 router.param('userid', userController.load); // autoload :userid
+router.param('commentid', commentController.load); // autoload :commentid
+
+/* Rutas de Comentarios */
+
+router.get('/posts/:postid([0-9]+)/comments', 
+  commentController.index);
+
+router.get('/posts/:postid([0-9]+)/comments/new', 
+  sessionController.loginRequired,
+  commentController.new);
+
+router.get('/posts/:postid([0-9]+)/comments/:commentid([0-9]+)',
+  commentController.show);
+
+router.post('/posts/:postid([0-9]+)/comments', 
+   sessionController.loginRequired,
+   commentController.create);
+
+router.get('/posts/:postid([0-9]+)/comments/:commentid([0-9]+)/edit', 
+  sessionController.loginRequired,
+  commentController.loggedUserIsAuthor,
+  commentController.edit);
+
+router.put('/posts/:postid([0-9]+)/comments/:commentid([0-9]+)', 
+  sessionController.loginRequired,
+  commentController.loggedUserIsAuthor,
+  commentController.update);
+
+router.delete('/posts/:postid([0-9]+)/comments/:commentid([0-9]+)', 
+     sessionController.loginRequired,
+     commentController.loggedUserIsAuthor,
+     commentController.destroy);
 
 /* Rutas de Posts */
 
