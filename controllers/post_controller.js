@@ -5,7 +5,7 @@ var models = require('../models');
 // Autoload :postid
 exports.load = function(req, res, next, id) {
   models.Post
-       .find({where: {id: Number(id)}})
+       .find(id)
        .success(function(post) {
           if (post) {
             req.post = post;
@@ -19,7 +19,6 @@ exports.load = function(req, res, next, id) {
           next(error);
        });
 };
-
 
 /*
 * Comprueba que el usuario logeado es el author.
@@ -36,6 +35,7 @@ exports.loggedUserIsAuthor = function(req, res, next) {
 
 
 //-----------------------------------------------------------
+
 
 // GET /posts
 exports.index = function(req, res, next) {
@@ -61,7 +61,7 @@ exports.show = function(req, res, next) {
 
     // Buscar el autor
     models.User
-        .find({where: {id: req.post.AuthorId}})
+        .find(req.post.AuthorId)
         .success(function(user) {
 
             // Si encuentro al autor lo añado como el atributo author,
