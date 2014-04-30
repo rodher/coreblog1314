@@ -5,7 +5,7 @@ var models = require('../models');
 // Autoload :postid
 exports.load = function(req, res, next, id) {
   models.Post
-       .find({where: {id: Number(id)}})
+       .find(id)
        .success(function(post) {
           if (post) {
             req.post = post;
@@ -19,6 +19,8 @@ exports.load = function(req, res, next, id) {
           next(error);
        });
 };
+
+//       .find({where: {id: Number(id)}})
 
 // GET /posts
 exports.index = function(req, res, next) {
