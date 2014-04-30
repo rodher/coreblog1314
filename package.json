@@ -18,7 +18,7 @@
     "sequelize": "~1.7.3",
     "pg": "~3.0.3"
   },
-  "devDpendencies": {
+  "devDependencies": {
     "sqlite3": "~2.2.3"
   },
   "engines": {
