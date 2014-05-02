@@ -9,7 +9,6 @@ router.get('/', function(req, res) {
   res.render('index');
 });
 
-
 /* Rutas de Posts */
 
 router.param('postid',postController.load);  // autoload :postid
@@ -21,5 +20,11 @@ router.post('/posts', postController.create);
 router.get('/posts/:postid([0-9]+)/edit', postController.edit);
 router.put('/posts/:postid([0-9]+)', postController.update);
 router.delete('/posts/:postid([0-9]+)', postController.destroy);
+
+/* GET creditos */
+router.get('/creditos', function(req, res, next){
+	res.render('creditos');
+});
+
 
 module.exports = router;
