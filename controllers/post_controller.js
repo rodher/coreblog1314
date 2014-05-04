@@ -46,8 +46,8 @@ exports.show = function(req, res, next) {
 exports.new = function(req, res, next) {
 
     var post = models.Post.build(
-        { title: 'Introduzca el título',
-          body:  'Introduzca el texto del artículo'
+        { title: '',
+          body:  ''
         });
     
     res.render('posts/new', {post: post,
@@ -130,4 +130,28 @@ exports.destroy = function(req, res, next) {
         .error(function(error) {
             next(error);
         });};
+
+// GET /posts/search?q=texto
+exports.search = function(req, res, next) {
+  if (req.query.q) {
+    console.log(req.query.q)
+    var q = "%"+req.query.q.replace(/\s/g,"%")+"%";
+    models.Post
+      .findAll({where: ["title LIKE ? OR body LIKE ?", q, q]})
+      .success(function(posts) {
+          res.render('posts/search', {
+             busq: req.query.q,  posts: posts
+          });
+          
+      })
+      .error(function(error) {
+          next(error);
+      }); 
+  } else{
+      res.render('posts/search', {
+          posts: null, busq: ""
+      });
+  };
+
+};
 

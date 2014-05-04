@@ -19,6 +19,7 @@ router.get('/posts/:postid([0-9]+)', postController.show);
 router.post('/posts', postController.create);
 router.get('/posts/:postid([0-9]+)/edit', postController.edit);
 router.put('/posts/:postid([0-9]+)', postController.update);
+router.get('/posts/search', postController.search);
 router.delete('/posts/:postid([0-9]+)', postController.destroy);
 
 /* GET creditos */

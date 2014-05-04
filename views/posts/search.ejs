@@ -1,0 +1,11 @@
+<h2>Buscar</h2>
+<form action="/posts/search" method="get">
+	<input type="text" name="q" placeholder="Búsqueda" value = "<%= busq %>" >
+	<input type="submit" value="Buscar">
+</form>
+<% if(posts){         	%>
+<% 	 include index.ejs 	%>
+<% }					%>
+
+<% console.log(posts); console.log(busq); %>
+
