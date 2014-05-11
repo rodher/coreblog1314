@@ -30,6 +30,7 @@ var sequelize = new Sequelize(DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD,
 var Post = sequelize.import(path.join(__dirname,'post'));
 var User = sequelize.import(path.join(__dirname,'user'));
 var Comment = sequelize.import(path.join(__dirname,'comment'));
+var Attachment = sequelize.import(path.join(__dirname,'attachment'));
 
 
 // Relaciones
@@ -46,6 +47,8 @@ User.hasMany(Post, {foreignKey: 'AuthorId'});
 User.hasMany(Comment, {foreignKey: 'AuthorId'});
 Post.hasMany(Comment);
 
+Post.hasMany(Attachment);
+
 // La llamada Post.belongsTo(User);
 //  - crea en el modelo de Post un atributo llamado UserId,
 //  - y en el prototipo de Post se crean los metodos getUser y setUser.
@@ -60,11 +63,14 @@ Post.belongsTo(User, {as: 'Author', foreignKey: 'AuthorId'});
 Comment.belongsTo(User, {as: 'Author', foreignKey: 'AuthorId'});
 Comment.belongsTo(Post);
 
+Attachment.belongsTo(Post);
+
 
 // Exportar los modelos:
 exports.Post = Post;
 exports.User = User;
 exports.Comment = Comment;
+exports.Attachment = Attachment;
 
 
 // Crear las tablas en la base de datos que no se hayan creado aun.

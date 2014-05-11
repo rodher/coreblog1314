@@ -4,7 +4,8 @@ var router = express.Router();
 var postController = require('../controllers/post_controller');
 var userController = require('../controllers/user_controller');
 var sessionController = require('../controllers/session_controller');
-var commentController = require('../controllers/comment_controller.js');
+var commentController = require('../controllers/comment_controller');
+var attachmentController = require('../controllers/attachment_controller');
 
 
 /* GET home page. */
@@ -26,6 +27,27 @@ router.get('/logout', sessionController.destroy);
 router.param('postid',postController.load);  // autoload :postid
 router.param('userid', userController.load); // autoload :userid
 router.param('commentid', commentController.load); // autoload :commentid
+router.param('attachmentid', attachmentController.load); // autoload :attachmentid
+
+/* Rutas de las imagenes adjuntas */
+
+router.get('/posts/:postid([0-9]+)/attachments', 
+  attachmentController.index);
+
+router.get('/posts/:postid([0-9]+)/attachments/new', 
+  sessionController.loginRequired,
+  postController.loggedUserIsAuthor,
+  attachmentController.new);
+
+router.post('/posts/:postid([0-9]+)/attachments', 
+   sessionController.loginRequired,
+   postController.loggedUserIsAuthor,
+   attachmentController.create);
+
+router.delete('/posts/:postid([0-9]+)/attachments/:attachmentid([0-9]+)', 
+     sessionController.loginRequired,
+     postController.loggedUserIsAuthor,
+     attachmentController.destroy);
 
 /* Rutas de Comentarios */
 

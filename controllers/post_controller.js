@@ -68,24 +68,32 @@ exports.show = function(req, res, next) {
             // si no lo encuentro añado {}.
             req.post.author = user || {};
 
-            // Buscar comentarios del post
-            models.Comment
-                 .findAll({where: {PostId: req.post.id},
-                           order: [['updatedAt','DESC']],
-                           include: [{ model: models.User, as: 'Author' }] 
-                 })
-                 .success(function(comments) {
-                    var new_comment = models.Comment.build({
-                        body: 'Introduzca el texto del comentario'
-                    });
-                    res.render('posts/show', {
-                        post: req.post,
-                        comments: comments,
-                        comment: new_comment,
-                        validate_errors: {}
-                    });
-                 })
-                 .error(function(error) {next(error);});
+
+            // Buscar imagenes adjuntas
+            req.post.getAttachments({order: [['updatedAt','DESC']]})
+               .success(function(attachments) {
+
+                    // Buscar comentarios del post
+                    models.Comment
+                         .findAll({where: {PostId: req.post.id},
+                                   order: [['updatedAt','DESC']],
+                                   include: [{ model: models.User, as: 'Author' }] 
+                         })
+                         .success(function(comments) {
+                            var new_comment = models.Comment.build({
+                                body: 'Introduzca el texto del comentario'
+                            });
+                            res.render('posts/show', {
+                                post: req.post,
+                                comments: comments,
+                                comment: new_comment,
+                                attachments: attachments,
+                                validate_errors: {}
+                            });
+                         })
+                         .error(function(error) {next(error);});
+               })
+               .error(function(error) {next(error);});
         })
         .error(function(error) {
             next(error);
@@ -178,6 +186,8 @@ exports.destroy = function(req, res, next) {
     var Sequelize = require('sequelize');
     var chainer = new Sequelize.Utils.QueryChainer
 
+    var cloudinary = require('cloudinary');
+
     // Obtener los comentarios:
     req.post.getComments()
        .success(function(comments) {
@@ -186,16 +196,37 @@ exports.destroy = function(req, res, next) {
                 chainer.add(comments[i].destroy());
            }
 
-           // Eliminar el post:
-           chainer.add(req.post.destroy());
+           // Obtener los adjuntos:
+           req.post.getAttachments()
+              .success(function(attachments) {
+                  for (var i in attachments) {
+                      // Eliminar un adjunto:
+                      chainer.add(attachments[i].destroy());
 
-           // Ejecutar el chainer:
-           chainer.run()
-            .success(function(){
-                 req.flash('success', 'Post eliminado con éxito.');
-                 res.redirect('/posts');
-            })
-            .error(function(errors){ next(errors[0]); })
+                      // Borrar el fichero en Cloudinary:
+                      cloudinary.api.delete_resources(attachments[i].public_id,
+                                    function(result) {});
+                  }
+
+                  // Eliminar el post:
+                  chainer.add(req.post.destroy());
+
+                  // Ejecutar el chainer:
+                  chainer.run()
+                      .success(function(){
+                          req.flash('success', 'Post eliminado con éxito.');
+                          res.redirect('/posts');
+                      })
+                      .error(function(errors){
+                          next(errors[0]);   
+                      })
+              })
+              .error(function(error) {
+                  next(error);
+              });
        })
-       .error(function(error) { next(error); });
+       .error(function(error) {
+           next(error);
+       });
 };
+
