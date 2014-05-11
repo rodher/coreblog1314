@@ -44,7 +44,7 @@ var Comment = sequelize.import(path.join(__dirname,'comment'));
 User.hasMany(Post, {foreignKey: 'AuthorId'});
 
 User.hasMany(Comment, {foreignKey: 'AuthorId'});
-Post.hasMany(Comment, {onDelete: 'cascade'});
+Post.hasMany(Comment);
 
 // La llamada Post.belongsTo(User);
 //  - crea en el modelo de Post un atributo llamado UserId,
