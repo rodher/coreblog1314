@@ -135,7 +135,7 @@ exports.destroy = function(req, res, next) {
 exports.search = function(req, res, next) {
   if (req.query.q) {
     console.log(req.query.q)
-    var q = "%"+req.query.q.replace(/\s/g,"%")+"%";
+    var q = "%"+req.query.q.replace(/\s+/g,"%")+"%";
     models.Post
       .findAll({where: ["title LIKE ? OR body LIKE ?", q, q]})
       .success(function(posts) {
