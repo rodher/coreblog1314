@@ -61,4 +61,4 @@ exports.User = User;
 
 // Crear las tablas en la base de datos que no se hayan creado aun.
 // En un futuro lo haremos con migraciones.
-sequelize.sync();
+sequelize.sync({force:true});
