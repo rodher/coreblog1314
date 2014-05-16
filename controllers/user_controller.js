@@ -64,9 +64,9 @@ exports.show = function(req, res, next) {
 exports.new = function(req, res, next) {
 
     var user = models.User.build(
-        { login: 'Tu login',
-          name:  'Tu nombre',
-          email: 'Tu email'
+        { login: '',
+          name:  '',
+          email: ''
         });
     
     res.render('users/new', {user: user,
@@ -146,6 +146,8 @@ exports.update = function(req, res, next) {
     // req.user.login = req.body.user.login;  // No se puede editar.
     req.user.name  = req.body.user.name;
     req.user.email = req.body.user.email;
+
+    req.session.user.name = req.body.user.name;
     
     var validate_errors = req.user.validate();
     if (validate_errors) {

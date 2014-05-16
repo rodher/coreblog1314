@@ -9,6 +9,7 @@ var partials = require('express-partials');
 var connect = require('connect');
 var routes = require('./routes/index');
 var flash = require('express-flash');
+var sessionController = require('./controllers/session_controller');
 
 var app = express();
 
@@ -36,6 +37,8 @@ app.use(function(req, res, next) {
 
    next();
 });
+
+app.use(sessionController.checkActivity);
 
 app.use('/', routes);
 

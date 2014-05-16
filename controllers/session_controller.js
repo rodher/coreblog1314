@@ -9,6 +9,10 @@
 // Guardo cual es mi url para volver automaticamente a esa url 
 // despues de hacer login. 
 //
+
+var time_s =30;
+var time_ms=time_s*1000;
+
 exports.loginRequired = function (req, res, next) {
     if (req.session.user) {
         next();
@@ -68,7 +72,7 @@ exports.create = function(req, res) {
         // IMPORTANTE: creo req.session.user.
         // Solo guardo algunos campos del usuario en la sesion.
         // Esto es lo que uso para saber si he hecho login o no.
-        req.session.user = {id:user.id, login:user.login, name:user.name};
+        req.session.user = {id:user.id, login:user.login, name:user.name, expire:+Date.now()+time_ms};
 
         // Vuelvo al url indicado en redir
         res.redirect(redir);
@@ -86,3 +90,22 @@ exports.destroy = function(req, res) {
     req.flash('success', 'Logout.');
     res.redirect("/login");     
 };
+
+exports.checkActivity = function (req, res, next) {
+    if(req.session.user){
+        var now = Date.now();
+        if(now<req.session.user.expire){
+            req.session.user.expire = now+time_ms;
+            next();
+        }
+        else {
+            delete req.session.user;
+            req.flash('error', 'La sesión ha expirado.');
+            res.redirect('/login?redir=' + req.url);
+        }
+    }
+    else{
+        next();
+    }
+
+}

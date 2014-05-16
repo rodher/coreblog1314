@@ -27,7 +27,7 @@
 
      <% if ( ! user.id) { %>
         <label for="user_login">Login:</label><br />
-        <input type="text" id="user_login" name="user[login]" size="30" 
+        <input type="text" id="user_login" name="user[login]" size="30" placeholder="Tu login"
                value='<%= user.login %>' />
      <% } else { %>
         Login: <%= user.login %>
@@ -38,7 +38,7 @@
   <div class='<%- validate_errors.name ? "invalid_field" : "field" %>'>
 
     <label for="user_name">Nombre</label><br />
-    <input type="text" id="user_name" name="user[name]" size="30" 
+    <input type="text" id="user_name" name="user[name]" size="30" placeholder="Tu nombre"
            value='<%= user.name %>' />
   </div>
 
@@ -46,7 +46,7 @@
   <div class='<%- validate_errors.email ? "invalid_field" : "field" %>'>
 
     <label for="user_email">Email</label><br />
-    <input type="text" id="user_email" name="user[email]" size="30" 
+    <input type="text" id="user_email" name="user[email]" size="30" placeholder="Tu email"
            value='<%= user.email %>' />
   </div>
 
