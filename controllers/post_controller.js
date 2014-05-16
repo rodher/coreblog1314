@@ -20,12 +20,31 @@ exports.load = function(req, res, next, id) {
        });
 };
 
-//       .find({where: {id: Number(id)}})
+/*
+* Comprueba que el usuario logeado es el author.
+*/
+exports.loggedUserIsAuthor = function(req, res, next) {
+    
+    if (req.session.user && req.session.user.id == req.post.AuthorId) {
+      next();
+    } else {
+      console.log('Operación prohibida: El usuario logeado no es el autor del post.');
+      res.send(403);
+    }
+};
+
+
+//-----------------------------------------------------------
+
 
 // GET /posts
 exports.index = function(req, res, next) {
     models.Post
-        .findAll({order: [['updatedAt','DESC']]})
+        .findAll({order: [['updatedAt','DESC']],
+                  include: [ { model: models.User, 
+                               as: 'Author' } 
+                           ]
+                 })
         .success(function(posts) {
             res.render('posts/index', {
                 posts: posts
@@ -39,7 +58,23 @@ exports.index = function(req, res, next) {
 
 // GET /posts/33
 exports.show = function(req, res, next) {
-   res.render('posts/show', {post: req.post});
+
+    // Buscar el autor
+    models.User
+        .find(req.post.AuthorId)
+        .success(function(user) {
+
+            // Si encuentro al autor lo añado como el atributo author,
+            // si no lo encuentro añado {}.
+            req.post.author = user || {};
+
+            res.render('posts/show', {
+                post: req.post
+            });
+        })
+        .error(function(error) {
+            next(error);
+        });
 };
 
 // GET /posts/new
@@ -59,7 +94,8 @@ exports.create = function(req, res, next) {
   
      var post = models.Post.build(
         { title: req.body.post.title,
-          body: req.body.post.body
+          body: req.body.post.body,
+          AuthorId: req.session.user.id
         });
     
     var validate_errors = post.validate();

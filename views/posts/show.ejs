@@ -4,7 +4,7 @@
   <b><%= post.title %></b>
   <br />
   by 
-  <em>Anónimo</em>
+  <em><%= post.author && post.author.name || 'Sin autor' %></em>
 </p>
 
 <p>
@@ -14,7 +14,11 @@
 <p><%- escapeText(post.body) %></p>
 
 
-<a href="/posts/<%= post.id %>/edit"> Edit </a>
+<% if (session.user && session.user.id == post.AuthorId) {%>
+
+   <a href="/posts/<%= post.id %>/edit"> Edit </a>
+
+<% } %>
 
 
 <a href="/posts"> Back  </a>

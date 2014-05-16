@@ -37,10 +37,13 @@ router.get('/posts/search', postController.search);
 router.post('/posts', sessionController.loginRequired,
                       postController.create);
 router.get('/posts/:postid([0-9]+)/edit', sessionController.loginRequired,
+                                          postController.loggedUserIsAuthor,
                                           postController.edit);
 router.put('/posts/:postid([0-9]+)', sessionController.loginRequired,
+                                     postController.loggedUserIsAuthor,
                                      postController.update);
 router.delete('/posts/:postid([0-9]+)', sessionController.loginRequired,
+                                        postController.loggedUserIsAuthor,
                                         postController.destroy);
 
 /* Rutas de Users */
@@ -50,11 +53,13 @@ router.get('/users/new', userController.new);
 router.get('/users/:userid([0-9]+)', userController.show);
 router.post('/users', userController.create);
 router.get('/users/:userid([0-9]+)/edit', sessionController.loginRequired,
+                                          userController.loggedUserIsUser,
                                           userController.edit);
 router.put('/users/:userid([0-9]+)', sessionController.loginRequired,
+                                     userController.loggedUserIsUser,
                                      userController.update);
-router.delete('/users/:userid([0-9]+)', sessionController.loginRequired,
-                                        userController.destroy);
+// router.delete('/users/:userid([0-9]+)', sessionController.loginRequired,
+//                                         userController.destroy);
 
 /* GET creditos */
 router.get('/creditos', function(req, res, next){
