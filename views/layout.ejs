@@ -11,10 +11,22 @@
    <header>
      <h1> COmputación en REd - CORE</h1>
      <nav> 
+         <div id='logininfo'>
+           <% if (session.user) { %>
+               <%= session.user.name %>
+               <a href='/logout'> Logout </a> 
+           <% } else { %>
+              <a href='/login?redir=/posts'> Login </a> 
+              <a href='/users/new'> Register </a> 
+           <% } %>
+         </div>
+
          <a href="/">Home</a>    
          <a href="/posts">Posts</a>
          <a href="/posts/search">Buscar</a>
+         <a href="/users">Usuarios</a>
          <a href="/creditos">Créditos</a>
+
      </nav>
    </header>
   
