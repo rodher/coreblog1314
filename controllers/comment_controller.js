@@ -9,7 +9,7 @@ var userController = require('./user_controller');
 exports.load = function(req, res, next, id) {
 
    models.Comment
-        .find({where: {id: Number(id)}})
+        .find(id)
         .success(function(comment) {
             if (comment) {
                 req.comment = comment;
@@ -64,7 +64,7 @@ exports.show = function(req, res, next) {
 
    // Buscar el autor del post
     models.User
-        .find({where: {id: req.post.AuthorId}})
+        .find(req.post.AuthorId)
         .success(function(user) {
 
             // Añado el autor del post como el atributo "author". 
@@ -73,7 +73,7 @@ exports.show = function(req, res, next) {
 
             // Buscar el autor del comentario
             models.User
-                .find({where: {id: req.comment.AuthorId}})
+                .find(req.comment.AuthorId)
                 .success(function(user) {
 
                     // Añado el autor del comentario como el atributo "author".

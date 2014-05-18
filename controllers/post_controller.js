@@ -5,7 +5,7 @@ var models = require('../models');
 // Autoload :postid
 exports.load = function(req, res, next, id) {
   models.Post
-       .find({where: {id: Number(id)}})
+       .find(id)
        .success(function(post) {
           if (post) {
             req.post = post;
@@ -19,7 +19,6 @@ exports.load = function(req, res, next, id) {
           next(error);
        });
 };
-
 
 /*
 * Comprueba que el usuario logeado es el author.
@@ -36,6 +35,7 @@ exports.loggedUserIsAuthor = function(req, res, next) {
 
 
 //-----------------------------------------------------------
+
 
 // GET /posts
 exports.index = function(req, res, next) {
@@ -61,31 +61,39 @@ exports.show = function(req, res, next) {
 
     // Buscar el autor
     models.User
-        .find({where: {id: req.post.AuthorId}})
+        .find(req.post.AuthorId)
         .success(function(user) {
 
             // Si encuentro al autor lo añado como el atributo author,
             // si no lo encuentro añado {}.
             req.post.author = user || {};
 
-            // Buscar comentarios del post
-            models.Comment
-                 .findAll({where: {PostId: req.post.id},
-                           order: [['updatedAt','DESC']],
-                           include: [{ model: models.User, as: 'Author' }] 
-                 })
-                 .success(function(comments) {
-                    var new_comment = models.Comment.build({
-                        body: 'Introduzca el texto del comentario'
-                    });
-                    res.render('posts/show', {
-                        post: req.post,
-                        comments: comments,
-                        comment: new_comment,
-                        validate_errors: {}
-                    });
-                 })
-                 .error(function(error) {next(error);});
+
+            // Buscar imagenes adjuntas
+            req.post.getAttachments({order: [['updatedAt','DESC']]})
+               .success(function(attachments) {
+
+                    // Buscar comentarios del post
+                    models.Comment
+                         .findAll({where: {PostId: req.post.id},
+                                   order: [['updatedAt','DESC']],
+                                   include: [{ model: models.User, as: 'Author' }] 
+                         })
+                         .success(function(comments) {
+                            var new_comment = models.Comment.build({
+                                body: 'Introduzca el texto del comentario'
+                            });
+                            res.render('posts/show', {
+                                post: req.post,
+                                comments: comments,
+                                comment: new_comment,
+                                attachments: attachments,
+                                validate_errors: {}
+                            });
+                         })
+                         .error(function(error) {next(error);});
+               })
+               .error(function(error) {next(error);});
         })
         .error(function(error) {
             next(error);
@@ -168,17 +176,57 @@ exports.update = function(req, res, next) {
         })
         .error(function(error) {
             next(error);
-        });};
+        });
+};
+
 
 // DELETE /posts/33
 exports.destroy = function(req, res, next) {
 
-    req.post.destroy()
-        .success(function() {
-            req.flash('success', 'Post eliminado con éxito.');
-            res.redirect('/posts');
-        })
-        .error(function(error) {
-            next(error);
-        });};
+    var Sequelize = require('sequelize');
+    var chainer = new Sequelize.Utils.QueryChainer
+
+    var cloudinary = require('cloudinary');
+
+    // Obtener los comentarios:
+    req.post.getComments()
+       .success(function(comments) {
+           for (var i in comments) {
+                // Eliminar un comentario:
+                chainer.add(comments[i].destroy());
+           }
+
+           // Obtener los adjuntos:
+           req.post.getAttachments()
+              .success(function(attachments) {
+                  for (var i in attachments) {
+                      // Eliminar un adjunto:
+                      chainer.add(attachments[i].destroy());
+
+                      // Borrar el fichero en Cloudinary:
+                      cloudinary.api.delete_resources(attachments[i].public_id,
+                                    function(result) {});
+                  }
+
+                  // Eliminar el post:
+                  chainer.add(req.post.destroy());
+
+                  // Ejecutar el chainer:
+                  chainer.run()
+                      .success(function(){
+                          req.flash('success', 'Post eliminado con éxito.');
+                          res.redirect('/posts');
+                      })
+                      .error(function(errors){
+                          next(errors[0]);   
+                      })
+              })
+              .error(function(error) {
+                  next(error);
+              });
+       })
+       .error(function(error) {
+           next(error);
+       });
+};
 

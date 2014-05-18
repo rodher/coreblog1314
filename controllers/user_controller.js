@@ -8,7 +8,7 @@ var crypto = require('crypto');
 */
 exports.load = function(req, res, next, id) {
    models.User
-        .find({where: {id: Number(id)}})
+        .find(id)
         .success(function(user) {
             if (user) {
                 req.user = user;
