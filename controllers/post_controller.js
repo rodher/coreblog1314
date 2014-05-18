@@ -46,6 +46,7 @@ exports.index = function(req, res, next) {
                            ]
                  })
         .success(function(posts) {
+            console.log(posts[0]);
             res.render('posts/index', {
                 posts: posts
             });
@@ -173,8 +174,14 @@ exports.search = function(req, res, next) {
     console.log(req.query.q)
     var q = "%"+req.query.q.replace(/\s+/g,"%")+"%";
     models.Post
-      .findAll({where: ["title LIKE ? OR body LIKE ?", q, q]})
+      .findAll({where: ["title LIKE ? OR body LIKE ?", q, q],
+                order: [['updatedAt','DESC']],
+                include: [ { model: models.User, 
+                               as: 'Author' } 
+                          ]
+                })
       .success(function(posts) {
+          console.log(posts[0]);
           res.render('posts/search', {
              busq: req.query.q,  posts: posts
           });
