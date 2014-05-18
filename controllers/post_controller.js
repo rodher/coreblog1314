@@ -82,7 +82,7 @@ exports.show = function(req, res, next) {
                          })
                          .success(function(comments) {
                             var new_comment = models.Comment.build({
-                                body: 'Introduzca el texto del comentario'
+                                body: ''
                             });
                             res.render('posts/show', {
                                 post: req.post,
