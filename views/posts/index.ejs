@@ -3,8 +3,11 @@
 </header>
 
 <% for (var i in posts) { %>
+
+  <% var post= posts[i]; %>
   <article>
      <header>
+        <%- include ../favourites/_stars.ejs %>
         <h3> 
           <a href='/posts/<%= posts[i].id %>'> <%= posts[i].title %> </a>
         </h3>

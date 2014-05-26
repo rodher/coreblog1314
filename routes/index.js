@@ -6,6 +6,7 @@ var userController = require('../controllers/user_controller');
 var sessionController = require('../controllers/session_controller');
 var commentController = require('../controllers/comment_controller');
 var attachmentController = require('../controllers/attachment_controller');
+var favouriteController = require('../controllers/favourite_controller');
 
 
 /* GET home page. */
@@ -115,6 +116,17 @@ router.put('/users/:userid([0-9]+)', sessionController.loginRequired,
                                      userController.update);
 // router.delete('/users/:userid([0-9]+)', sessionController.loginRequired,
 //                                         userController.destroy);
+
+// Rutas de Favoritos
+
+router.get('/users/:userid([0-9]+)/favourites', favouriteController.index);
+
+router.put('/users/:userid([0-9]+)/favourites/:postid([0-9]+)', sessionController.loginRequired,
+                                                                userController.loggedUserIsUser,
+                                                                favouriteController.add);
+router.delete('/users/:userid([0-9]+)/favourites/:postid([0-9]+)', sessionController.loginRequired,
+                                                                userController.loggedUserIsUser,
+                                                                favouriteController.del);
 
 /* GET creditos */
 router.get('/creditos', function(req, res, next){

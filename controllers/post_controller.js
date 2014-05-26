@@ -46,11 +46,35 @@ exports.index = function(req, res, next) {
                            ]
                  })
         .success(function(posts) {
-            console.log(posts[0]);
-            res.render('posts/index', {
-                posts: posts
-            });
-            
+            if(req.session.user){
+              var postIds = posts.map(function(post){ return post.id; });
+              models.Favourite
+                .findAll({ where: { UserId: req.session.user.id,
+                                    PostId: postIds}
+                })
+                .success(function(favourites){
+                  for(var i in posts){
+                    posts[i].best=0;
+
+                    for( var j in favourites){
+                      if(posts[i].id == favourites[j].PostId){
+                        posts[i].best = favourites[j].best;
+                        break;
+                      }
+                    }
+                  }
+
+                  res.render('posts/index', {
+                      posts: posts
+                  });
+                })
+                .error(function(error){ next(error);});
+            }
+            else{
+              res.render('posts/index', {
+                  posts: posts
+              });              
+            }        
         })
         .error(function(error) {
             next(error);
@@ -84,13 +108,33 @@ exports.show = function(req, res, next) {
                             var new_comment = models.Comment.build({
                                 body: ''
                             });
-                            res.render('posts/show', {
-                                post: req.post,
-                                comments: comments,
-                                comment: new_comment,
-                                attachments: attachments,
-                                validate_errors: {}
-                            });
+
+                            if(req.session.user){
+                              models.Favourite
+                                .find({ where: {  PostId: req.post.id,
+                                                  UserId: req.session.user.id}
+                                })
+                                .success(function(favourite){
+                                  req.post.best = favourite && favourite.best || 0;
+
+                                  res.render('posts/show', {
+                                      post: req.post,
+                                      comments: comments,
+                                      comment: new_comment,
+                                      attachments: attachments,
+                                      validate_errors: {}
+                                  });                                  
+                                })
+                                .error(function(error) {next(error);});
+                            } else {
+                                res.render('posts/show', {
+                                    post: req.post,
+                                    comments: comments,
+                                    comment: new_comment,
+                                    attachments: attachments,
+                                    validate_errors: {}
+                                });
+                              }
                          })
                          .error(function(error) {next(error);});
                })
@@ -244,11 +288,35 @@ exports.search = function(req, res, next) {
                           ]
                 })
       .success(function(posts) {
-          console.log(posts[0]);
-          res.render('posts/search', {
-             busq: req.query.q,  posts: posts
-          });
-          
+          if(req.session.user){
+            var postIds = posts.map(function(post){ return post.id; });
+            models.Favourite
+              .findAll({ where: { UserId: req.session.user.id,
+                                  PostId: postIds}
+              })
+              .success(function(favourites){
+                for(var i in posts){
+                  posts[i].best=0;
+
+                  for( var j in favourites){
+                    if(posts[i].id == favourites[j].PostId){
+                      posts[i].best = favourites[j].best;
+                      break;
+                    }
+                  }
+                }
+
+                res.render('posts/search', {
+                    busq: req.query.q,  posts: posts
+                });
+              })
+              .error(function(error){ next(error);});
+          }
+          else{
+            res.render('posts/search', {
+                busq: req.query.q,  posts: posts
+            });              
+          }        
       })
       .error(function(error) {
           next(error);

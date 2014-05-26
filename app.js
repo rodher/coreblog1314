@@ -38,7 +38,15 @@ app.use(function(req, res, next) {
    next();
 });
 
+// Autologout
 app.use(sessionController.checkActivity);
+
+//Helper dinamico
+app.use(function(req,res,next){
+  res.locals.session = req.session;
+  res.locals.url = req.url;
+  next();
+});
 
 app.use('/', routes);
 

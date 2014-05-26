@@ -10,7 +10,7 @@
 // despues de hacer login. 
 //
 
-var time_s =30;
+var time_s =5*60; // 5 minutos de inactividad para expirar la sesion
 var time_ms=time_s*1000;
 
 exports.loginRequired = function (req, res, next) {
@@ -100,7 +100,7 @@ exports.checkActivity = function (req, res, next) {
         }
         else {
             delete req.session.user;
-            req.flash('error', 'La sesión ha expirado.');
+            req.flash('info', 'La sesión ha expirado.');
             res.redirect('/login?redir=' + req.url);
         }
     }

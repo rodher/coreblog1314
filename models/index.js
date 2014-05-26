@@ -31,6 +31,7 @@ var Post = sequelize.import(path.join(__dirname,'post'));
 var User = sequelize.import(path.join(__dirname,'user'));
 var Comment = sequelize.import(path.join(__dirname,'comment'));
 var Attachment = sequelize.import(path.join(__dirname,'attachment'));
+var Favourite = sequelize.import(path.join(__dirname,'favourite'));
 
 
 // Relaciones
@@ -65,12 +66,19 @@ Comment.belongsTo(Post);
 
 Attachment.belongsTo(Post);
 
+//Relaciones con los favoritos
+User.hasMany(Favourite);
+Favourite.belongsTo(User);
+Post.hasMany(Favourite);
+Favourite.belongsTo(Post);
 
 // Exportar los modelos:
 exports.Post = Post;
 exports.User = User;
 exports.Comment = Comment;
 exports.Attachment = Attachment;
+exports.Favourite = Favourite;
+
 
 
 // Crear las tablas en la base de datos que no se hayan creado aun.
